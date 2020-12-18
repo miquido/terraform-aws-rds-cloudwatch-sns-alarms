@@ -115,7 +115,7 @@ Available targets:
 2. Regenerate documentation
 
     ```bash
-    bash <(curl -s https://terraform.s3.k.miquido.net/update.sh)
+    bash <(git archive --remote=git@gitlab.com:miquido/terraform/terraform-readme-update.git master update.sh)
     ```
 
 3. Run lint
