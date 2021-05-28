@@ -13,7 +13,7 @@ check-formatting:
 validate:
   extends: .validate
   variables:
-    ENVIRONMENTS: examples/complete examples/fargate-spot
+    ENVIRONMENTS: examples/complete
 
 bump-tag:
   extends: .bump_minor_tag
