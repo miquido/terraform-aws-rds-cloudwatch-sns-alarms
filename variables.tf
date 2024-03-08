@@ -80,3 +80,15 @@ variable "swap_usage_threshold" {
   default     = 256000000
   # 256 Megabyte in Byte
 }
+
+variable "sns_alarm_topic_arn" {
+  description = "Provide SNS topic arn where threshold alarms actions will be sent"
+  type        = string
+  default     = null
+}
+
+variable "sns_ok_topic_arn" {
+  description = "Provide SNS topic arn where threshold OK actions will be sent"
+  type        = string
+  default     = null
+}
