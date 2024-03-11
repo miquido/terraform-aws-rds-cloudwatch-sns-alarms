@@ -34,8 +34,12 @@ module "rds_alarms" {
   namespace      = "example"
 }
 
-output "rds_alarms_sns_topic_arn" {
-  value = module.rds_alarms.sns_topic_arn
+output "rds_alarms_sns_alarm_topic_arn" {
+  value = module.rds_alarms.sns_alarm_arn
+}
+
+output "rds_alarms_sns_ok_topic_arn" {
+  value = module.rds_alarms.sns_ok_arn
 }
 
 output "rds_arn" {

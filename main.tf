@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
       "SNS:AddPermission",
     ]
 
-    effect    = "Allow"
+    effect = "Allow"
     resources = [
       local.sns_ok_topic_arn
     ]
@@ -112,8 +112,8 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
   }
 
   statement {
-    sid       = "Allow CloudwatchEvents"
-    actions   = ["sns:Publish"]
+    sid     = "Allow CloudwatchEvents"
+    actions = ["sns:Publish"]
     resources = [
       local.sns_ok_topic_arn
     ]
@@ -125,8 +125,8 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
   }
 
   statement {
-    sid       = "Allow RDS Event Notification"
-    actions   = ["sns:Publish"]
+    sid     = "Allow RDS Event Notification"
+    actions = ["sns:Publish"]
     resources = [
       local.sns_ok_topic_arn
     ]
@@ -152,7 +152,7 @@ data "aws_iam_policy_document" "sns_alarm_topic_policy" {
       "SNS:AddPermission",
     ]
 
-    effect    = "Allow"
+    effect = "Allow"
     resources = [
       local.sns_alarm_topic_arn
     ]
@@ -173,8 +173,8 @@ data "aws_iam_policy_document" "sns_alarm_topic_policy" {
   }
 
   statement {
-    sid       = "Allow CloudwatchEvents"
-    actions   = ["sns:Publish"]
+    sid     = "Allow CloudwatchEvents"
+    actions = ["sns:Publish"]
     resources = [
       local.sns_alarm_topic_arn
     ]
@@ -186,8 +186,8 @@ data "aws_iam_policy_document" "sns_alarm_topic_policy" {
   }
 
   statement {
-    sid       = "Allow RDS Event Notification"
-    actions   = ["sns:Publish"]
+    sid     = "Allow RDS Event Notification"
+    actions = ["sns:Publish"]
     resources = [
       local.sns_alarm_topic_arn
     ]
