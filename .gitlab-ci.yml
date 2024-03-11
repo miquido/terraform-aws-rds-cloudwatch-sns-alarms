@@ -1,8 +1,8 @@
 ---
 include:
-  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.88/terraform-toolkit.yml"
-  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.88/git-toolkit.yml"
-  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.88/gitlab-toolkit.yml"
+  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.89/terraform-toolkit.yml"
+  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.89/git-toolkit.yml"
+  - remote: "https://raw.githubusercontent.com/miquido/gitlab-templates/1.3.89/gitlab-toolkit.yml"
 
 
 get-latest-terraform:
@@ -18,6 +18,16 @@ validate:
 
 miquido-ci-schema-validation:
   extends: .miquido-ci-schema-validation
+
+docs:
+  extends: .generate_readme
+  stage: .post
+
+push_readme:
+  extends: .push_readme
+  stage: .post
+  dependencies: [ "docs" ]
+  needs: [ "docs" ]
 
 bump-tag:
   extends: .bump_minor_tag
