@@ -68,16 +68,21 @@ resource "aws_db_event_subscription" "default" {
 resource "aws_sns_topic_policy" "alarm" {
   count  = var.sns_alarm_topic_arn == null ? 1 : 0
   arn    = aws_sns_topic.alarm[0].arn
-  policy = data.aws_iam_policy_document.sns_alarm_topic_policy.json
+  policy = data.aws_iam_policy_document.sns_topic_policy[local.sns_alarm_topic_arn].json
 }
 
 resource "aws_sns_topic_policy" "ok" {
   count  = var.sns_ok_topic_arn == null ? 1 : 0
   arn    = aws_sns_topic.ok[0].arn
-  policy = data.aws_iam_policy_document.sns_ok_topic_policy.json
+  policy = data.aws_iam_policy_document.sns_topic_policy[local.sns_ok_topic_arn].json
 }
 
-data "aws_iam_policy_document" "sns_ok_topic_policy" {
+locals {
+  topics = toset([local.sns_ok_topic_arn, local.sns_alarm_topic_arn])
+}
+
+data "aws_iam_policy_document" "sns_topic_policy" {
+  for_each = local.topics
   statement {
     actions = [
       "SNS:Subscribe",
@@ -93,7 +98,7 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
 
     effect = "Allow"
     resources = [
-      local.sns_ok_topic_arn
+      each.value
     ]
 
     principals {
@@ -115,7 +120,7 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
     sid     = "Allow CloudwatchEvents"
     actions = ["sns:Publish"]
     resources = [
-      local.sns_ok_topic_arn
+      each.value
     ]
 
     principals {
@@ -128,68 +133,7 @@ data "aws_iam_policy_document" "sns_ok_topic_policy" {
     sid     = "Allow RDS Event Notification"
     actions = ["sns:Publish"]
     resources = [
-      local.sns_ok_topic_arn
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["rds.amazonaws.com"]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "sns_alarm_topic_policy" {
-  statement {
-    actions = [
-      "SNS:Subscribe",
-      "SNS:SetTopicAttributes",
-      "SNS:RemovePermission",
-      "SNS:Receive",
-      "SNS:Publish",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:GetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:AddPermission",
-    ]
-
-    effect = "Allow"
-    resources = [
-      local.sns_alarm_topic_arn
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-
-      values = [
-        data.aws_caller_identity.default.account_id,
-      ]
-    }
-  }
-
-  statement {
-    sid     = "Allow CloudwatchEvents"
-    actions = ["sns:Publish"]
-    resources = [
-      local.sns_alarm_topic_arn
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
-    }
-  }
-
-  statement {
-    sid     = "Allow RDS Event Notification"
-    actions = ["sns:Publish"]
-    resources = [
-      local.sns_alarm_topic_arn
+      each.value
     ]
 
     principals {
