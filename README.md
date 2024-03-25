@@ -131,6 +131,7 @@ module "rds_alarms" {
 | [aws_sns_topic_policy.ok](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_policy) | resource |
 | [aws_caller_identity.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.sns_topic_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_region.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
 
@@ -148,6 +149,8 @@ module "rds_alarms" {
 | <a name="input_name"></a> [name](#input\_name) | Name (unique identifier for app or service) | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace (e.g. `cp` or `cloudposse`) | `string` | n/a | yes |
 | <a name="input_sns_alarm_topic_arn"></a> [sns\_alarm\_topic\_arn](#input\_sns\_alarm\_topic\_arn) | Provide SNS topic arn where threshold alarms actions will be sent | `string` | `null` | no |
+| <a name="input_sns_create_alarm_topic"></a> [sns\_create\_alarm\_topic](#input\_sns\_create\_alarm\_topic) | Provide SNS topic arn where threshold alarms actions will be sent | `bool` | `true` | no |
+| <a name="input_sns_create_ok_topic"></a> [sns\_create\_ok\_topic](#input\_sns\_create\_ok\_topic) | Should create default SNS topic for OK actions | `bool` | `true` | no |
 | <a name="input_sns_ok_topic_arn"></a> [sns\_ok\_topic\_arn](#input\_sns\_ok\_topic\_arn) | Provide SNS topic arn where threshold OK actions will be sent | `string` | `null` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
 | <a name="input_swap_usage_threshold"></a> [swap\_usage\_threshold](#input\_swap\_usage\_threshold) | The maximum amount of swap space used on the DB instance in Byte. | `string` | `256000000` | no |
