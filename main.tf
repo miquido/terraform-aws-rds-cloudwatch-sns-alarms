@@ -1,8 +1,11 @@
 data "aws_caller_identity" "default" {}
+data "aws_region" "default" {}
 
 locals {
-  sns_alarm_topic_arn = var.sns_alarm_topic_arn == null ? aws_sns_topic.alarm[0].arn : var.sns_alarm_topic_arn
-  sns_ok_topic_arn    = var.sns_ok_topic_arn == null ? aws_sns_topic.ok[0].arn : var.sns_ok_topic_arn
+  sns_alarm_topic_arn = var.sns_alarm_topic_arn == null && var.sns_create_alarm_topic ? aws_sns_topic.alarm[0].arn : var.sns_alarm_topic_arn
+  sns_ok_topic_arn    = var.sns_ok_topic_arn == null && var.sns_create_ok_topic ? aws_sns_topic.ok[0].arn : var.sns_ok_topic_arn
+  ok_actions          = local.sns_ok_topic_arn != null ? [local.sns_ok_topic_arn] : []
+  alarm_actions       = local.sns_alarm_topic_arn != null ? [local.sns_alarm_topic_arn] : []
 }
 
 module "sns_topic_alarm_label" {
@@ -26,15 +29,15 @@ module "sns_topic_ok_label" {
 }
 
 resource "aws_sns_topic" "alarm" {
-  count       = var.sns_alarm_topic_arn == null ? 1 : 0
-  name_prefix = module.sns_topic_alarm_label.id
-  tags        = module.sns_topic_alarm_label.tags
+  count = var.sns_create_alarm_topic ? 1 : 0
+  name  = module.sns_topic_alarm_label.id
+  tags  = module.sns_topic_alarm_label.tags
 }
 
 resource "aws_sns_topic" "ok" {
-  count       = var.sns_ok_topic_arn == null ? 1 : 0
-  name_prefix = module.sns_topic_ok_label.id
-  tags        = module.sns_topic_ok_label.tags
+  count = var.sns_create_ok_topic ? 1 : 0
+  name  = module.sns_topic_ok_label.id
+  tags  = module.sns_topic_ok_label.tags
 }
 
 module "db_event_subscription_default_label" {
@@ -66,23 +69,19 @@ resource "aws_db_event_subscription" "default" {
 }
 
 resource "aws_sns_topic_policy" "alarm" {
-  count  = var.sns_alarm_topic_arn == null ? 1 : 0
+  count  = var.sns_create_alarm_topic ? 1 : 0
   arn    = aws_sns_topic.alarm[0].arn
-  policy = data.aws_iam_policy_document.sns_topic_policy[local.sns_alarm_topic_arn].json
+  policy = data.aws_iam_policy_document.sns_topic_policy[module.sns_topic_alarm_label.id].json
 }
 
 resource "aws_sns_topic_policy" "ok" {
-  count  = var.sns_ok_topic_arn == null ? 1 : 0
+  count  = var.sns_create_ok_topic ? 1 : 0
   arn    = aws_sns_topic.ok[0].arn
-  policy = data.aws_iam_policy_document.sns_topic_policy[local.sns_ok_topic_arn].json
-}
-
-locals {
-  topics = toset([local.sns_ok_topic_arn, local.sns_alarm_topic_arn])
+  policy = data.aws_iam_policy_document.sns_topic_policy[module.sns_topic_ok_label.id].json
 }
 
 data "aws_iam_policy_document" "sns_topic_policy" {
-  for_each = local.topics
+  for_each = toset([module.sns_topic_alarm_label.id, module.sns_topic_ok_label.id])
   statement {
     actions = [
       "SNS:Subscribe",
@@ -98,7 +97,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
 
     effect = "Allow"
     resources = [
-      each.value
+      "arn:aws:sns:${data.aws_region.default.id}:${data.aws_caller_identity.default.account_id}:${each.value}"
     ]
 
     principals {
@@ -120,7 +119,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
     sid     = "Allow CloudwatchEvents"
     actions = ["sns:Publish"]
     resources = [
-      each.value
+      "arn:aws:sns:${data.aws_region.default.id}:${data.aws_caller_identity.default.account_id}:${each.value}"
     ]
 
     principals {
@@ -133,7 +132,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
     sid     = "Allow RDS Event Notification"
     actions = ["sns:Publish"]
     resources = [
-      each.value
+      "arn:aws:sns:${data.aws_region.default.id}:${data.aws_caller_identity.default.account_id}:${each.value}"
     ]
 
     principals {

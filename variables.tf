@@ -87,8 +87,20 @@ variable "sns_alarm_topic_arn" {
   default     = null
 }
 
+variable "sns_create_alarm_topic" {
+  description = "Provide SNS topic arn where threshold alarms actions will be sent"
+  type        = bool
+  default     = true
+}
+
 variable "sns_ok_topic_arn" {
   description = "Provide SNS topic arn where threshold OK actions will be sent"
   type        = string
   default     = null
+}
+
+variable "sns_create_ok_topic" {
+  description = "Should create default SNS topic for OK actions"
+  type        = bool
+  default     = true
 }
